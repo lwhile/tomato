@@ -73,5 +73,5 @@ func main() {
 		return
 	}
 
-	select {}
+	//select {}
 }

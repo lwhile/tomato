@@ -11,6 +11,10 @@ var (
 	printWidth uint
 )
 
+const (
+	printPixel = "🍅"
+)
+
 func init() {
 	terminalWidth, err := terminal.Width()
 	if err != nil {
@@ -32,7 +36,7 @@ func setBoundary() error {
 }
 
 func printOneTomato(lastone bool) {
-	fmt.Print("🍅")
+	fmt.Print(printPixel)
 	if !lastone {
 		fmt.Print(" ")
 	}

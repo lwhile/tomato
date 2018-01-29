@@ -33,7 +33,7 @@ func New(name string, minutes int) *Tomato {
 func (t *Tomato) Start() error {
 	t.StartTime = time.Now()
 	fmt.Printf("Start tomato(%d minutes) %s at %v\n", t.Minutes, t.Name, t.StartTime)
-	go t.running()
+	t.running()
 	return nil
 }
 
