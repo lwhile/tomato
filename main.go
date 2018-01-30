@@ -2,76 +2,41 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/lwhile/ttomato/ttomato"
+
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 const (
 	defaultMinutes = 25
 )
 
-type arg struct {
-	ctrl    string
-	name    string
-	minutes int
-}
+var (
+	name  = kingpin.Flag("name", "").Short('n').String()
+	dur   = kingpin.Flag("duration", "").Short('d').Int()
+	actor = kingpin.Arg("actor", "").Required().String()
+)
 
-func parseArgs(args []string) (*arg, error) {
-	argRet := &arg{}
-
-	if len(args) > 0 {
-		argRet.ctrl = args[0]
-	}
-
-	args = args[1:]
-	if len(args) > 0 {
-		argRet.name = args[0]
-	} else {
-		argRet.name = fmt.Sprintf("tomato@%d", time.Now().Unix())
-	}
-
-	args = args[1:]
-	if len(args) > 0 {
-		minutes, err := strconv.Atoi(args[0])
-		if err != nil {
-			return nil, err
-		}
-		argRet.minutes = minutes
-	} else {
-		argRet.minutes = defaultMinutes
-	}
-
-	return argRet, nil
-}
-
-func behaveCtrl(arg *arg) error {
-	switch arg.ctrl {
+// support `new` argument now
+func actorCtrl() error {
+	switch *actor {
 	case "new":
-		tomato := ttomato.New(arg.name, arg.minutes)
+		tomato := ttomato.New(*name, *dur)
 		return tomato.Start()
 	}
-	return nil
+	return fmt.Errorf("Actore %s not supported", *actor)
 }
 
 func main() {
-	args := os.Args
-	if len(args) <= 1 {
-		fmt.Println("Use arguments `[new(n)]` to controll ttomato")
-		return
-	}
-	arg, err := parseArgs(args[1:])
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	kingpin.Parse()
 
-	if err := behaveCtrl(arg); err != nil {
-		fmt.Println(err)
-		return
+	if *name == "" {
+		*name = fmt.Sprintf("tomato@%d", time.Now().Unix())
 	}
-
-	//select {}
+	if *dur == 0 {
+		*dur = defaultMinutes
+	}
+	actorCtrl()
 }
