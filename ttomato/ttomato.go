@@ -2,9 +2,18 @@ package ttomato
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"log"
+
+	"github.com/faiface/beep"
+	"github.com/faiface/beep/mp3"
+	"github.com/faiface/beep/speaker"
+)
+
+const (
+	soundFile = "sound/sound1.mp3"
 )
 
 // Tomato model definition
@@ -43,7 +52,7 @@ func (t *Tomato) running() {
 	}
 
 	t.currLoc = 0
-	durSec := time.Duration(float32(t.seconds)/float32(printWidth)*1000) * time.Millisecond
+	durSec := t.calTickerDur()
 	ticker := time.NewTicker(durSec)
 	for {
 		select {
@@ -51,10 +60,15 @@ func (t *Tomato) running() {
 			t.currLoc++
 			t.triggerPrint()
 		case <-t.done:
-			fmt.Printf("\nFinish the tomato %s\n", t.Name)
+			t.finish()
 			return
 		}
 	}
+}
+
+// calculate the ticker duration
+func (t *Tomato) calTickerDur() time.Duration {
+	return time.Duration(float32(t.seconds)/float32(printWidth)*1000) * time.Millisecond
 }
 
 func (t *Tomato) triggerPrint() {
@@ -68,6 +82,31 @@ func (t *Tomato) triggerPrint() {
 	if lastOne {
 		close(t.done)
 	}
+}
+
+func (t *Tomato) finish() {
+	fmt.Printf("\nFinish the tomato %s\n", t.Name)
+	t.playSound()
+}
+
+func (t *Tomato) playSound() {
+	// play the sound
+	fp, err := os.Open(soundFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	done := make(chan struct{})
+
+	s, format, err := mp3.Decode(fp)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
+	go speaker.Play(beep.Seq(s, beep.Callback(func() { close(done) })))
+
+	<-done
 }
 
 // Stop a tomato
