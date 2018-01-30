@@ -8,12 +8,12 @@ import (
 	"log"
 
 	"github.com/faiface/beep"
-	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
+	"github.com/faiface/beep/wav"
 )
 
 const (
-	soundFile = "sound/sound1.mp3"
+	soundFile = "sound/sound0.wav"
 )
 
 // Tomato model definition
@@ -98,7 +98,7 @@ func (t *Tomato) playSound() {
 
 	done := make(chan struct{})
 
-	s, format, err := mp3.Decode(fp)
+	s, format, err := wav.Decode(fp)
 	if err != nil {
 		log.Fatal(err)
 	}
