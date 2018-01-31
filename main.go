@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/lwhile/ttomato/ttomato"
@@ -26,7 +27,7 @@ func actorCtrl() error {
 		tomato := ttomato.New(*name, *dur)
 		return tomato.Start()
 	}
-	return fmt.Errorf("Actore %s not supported", *actor)
+	return fmt.Errorf("Actore `%s` not supported", *actor)
 }
 
 func main() {
@@ -38,5 +39,9 @@ func main() {
 	if *dur == 0 {
 		*dur = defaultMinutes
 	}
-	actorCtrl()
+
+	err := actorCtrl()
+	if err != nil {
+		log.Println(err)
+	}
 }
