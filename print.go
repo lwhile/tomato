@@ -1,4 +1,4 @@
-package ttomato
+package tomato
 
 import (
 	"fmt"

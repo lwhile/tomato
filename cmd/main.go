@@ -5,8 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/lwhile/ttomato/ttomato"
-
+	"github.com/lwhile/tomato"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -24,8 +23,8 @@ var (
 func actorCtrl() error {
 	switch *actor {
 	case "new":
-		tomato := ttomato.New(*name, *dur)
-		return tomato.Start()
+		t := tomato.New(*name, *dur)
+		return t.Start()
 	}
 	return fmt.Errorf("Actore `%s` not supported", *actor)
 }
