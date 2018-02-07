@@ -18,6 +18,7 @@ const (
 
 // Tomato model definition
 type Tomato struct {
+	ID        int
 	Name      string
 	Minutes   int
 	StartTime time.Time
@@ -60,6 +61,7 @@ func (t *Tomato) running() {
 			t.currLoc++
 			t.triggerPrint()
 		case <-t.done:
+			ticker.Stop()
 			t.finish()
 			return
 		}

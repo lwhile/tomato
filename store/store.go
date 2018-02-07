@@ -1,7 +1,11 @@
 package store
 
+import (
+	"github.com/lwhile/tomato"
+)
+
 // Store interface
 type Store interface {
-	Save() error
+	Save(*tomato.Tomato) error
 	Read() error
 }
