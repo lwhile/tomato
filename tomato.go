@@ -18,14 +18,14 @@ const (
 
 // Tomato model definition
 type Tomato struct {
-	ID        int
-	Name      string
-	Minutes   int
-	StartTime time.Time
+	ID        uint64    `json:"id"`
+	Name      string    `json:"name"`
+	Minutes   int       `json:"minutes"`
+	StartTime time.Time `json:"start_time"`
 
 	seconds int
 	currLoc int
-	done    chan struct{}
+	Done    chan struct{} `json:"-"`
 }
 
 // New return a *Tomato
@@ -35,16 +35,15 @@ func New(name string, minutes int) *Tomato {
 		Minutes: minutes,
 
 		seconds: minutes * 60,
-		done:    make(chan struct{}),
+		Done:    make(chan struct{}),
 	}
 }
 
 // Start a tomato
-func (t *Tomato) Start() error {
+func (t *Tomato) Start() {
 	t.StartTime = time.Now()
 	fmt.Printf("Start tomato(%d minutes) %s at %v\n", t.Minutes, t.Name, t.StartTime)
 	t.running()
-	return nil
 }
 
 func (t *Tomato) running() {
@@ -60,7 +59,7 @@ func (t *Tomato) running() {
 		case <-ticker.C:
 			t.currLoc++
 			t.triggerPrint()
-		case <-t.done:
+		case <-t.Done:
 			ticker.Stop()
 			t.finish()
 			return
@@ -82,7 +81,7 @@ func (t *Tomato) triggerPrint() {
 		printOneTomato(lastOne)
 	}
 	if lastOne {
-		close(t.done)
+		close(t.Done)
 	}
 }
 

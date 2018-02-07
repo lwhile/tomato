@@ -5,6 +5,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/lwhile/tomato/store"
+
 	"github.com/lwhile/tomato"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -23,10 +25,18 @@ var (
 func actorCtrl() error {
 	switch *actor {
 	case "new":
-		t := tomato.New(*name, *dur)
-		return t.Start()
+		return new()
 	}
 	return fmt.Errorf("Actore `%s` not supported", *actor)
+}
+
+func new() error {
+	t := tomato.New(*name, *dur)
+	t.Start()
+
+	// tomato finish
+	<-t.Done
+	return store.DefaultStore.Save(t)
 }
 
 func main() {
@@ -41,6 +51,6 @@ func main() {
 
 	err := actorCtrl()
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 }
