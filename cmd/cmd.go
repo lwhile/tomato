@@ -26,6 +26,8 @@ func actorCtrl() error {
 	switch *actor {
 	case "new":
 		return new()
+	case "list":
+		return list()
 	}
 	return fmt.Errorf("Actore `%s` not supported", *actor)
 }
@@ -37,6 +39,15 @@ func new() error {
 	// tomato finish
 	<-t.Done
 	return store.DefaultStore.Save(t)
+}
+
+func list() error {
+	tomatos, err := store.DefaultStore.ReadAll()
+	if err != nil {
+		return err
+	}
+	tomato.PrintAllTomato(tomatos)
+	return nil
 }
 
 func main() {

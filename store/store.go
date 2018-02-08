@@ -9,7 +9,9 @@ import (
 // Store interface
 type Store interface {
 	Save(*tomato.Tomato) error
-	Read() error
+	Read(string) error
+	ReadAll() ([]tomato.Tomato, error)
+	Delete(string) error
 }
 
 // DefaultStore :

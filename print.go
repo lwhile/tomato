@@ -41,3 +41,11 @@ func printOneTomato(lastone bool) {
 		fmt.Print(" ")
 	}
 }
+
+// PrintAllTomato :
+func PrintAllTomato(tomatos []Tomato) {
+	fmt.Printf("ID\tName\t\t\tDurations\tStart time\n")
+	for _, t := range tomatos {
+		fmt.Printf("%d\t%s\t%d\t%s\n", t.ID, t.Name, t.Minutes, t.StartTime)
+	}
+}

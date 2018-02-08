@@ -48,6 +48,63 @@ func (b *boltDBCtrl) InitDBEnv() error {
 	return b.driver.Update(fn)
 }
 
+func (b *boltDBCtrl) Save(t *tomato.Tomato) error {
+	fn := func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(b.bucketName)
+		id, err := b.setupID(bucket, t)
+		if err != nil {
+			return err
+		}
+		data, err := json.Marshal(t)
+		if err != nil {
+			return err
+		}
+		return bucket.Put(id, data)
+	}
+
+	return b.driver.Update(fn)
+}
+
+func (b *boltDBCtrl) Read(string) error {
+	return nil
+}
+
+func (b *boltDBCtrl) ReadAll() ([]tomato.Tomato, error) {
+	tomatos := make([]tomato.Tomato, 0)
+
+	fn := func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(b.bucketName)
+		cursor := bucket.Cursor()
+
+		t := &tomato.Tomato{}
+		for key, val := cursor.First(); key != nil; key, val = cursor.Next() {
+			err := json.Unmarshal(val, t)
+			if err != nil {
+				return err
+			}
+			t.ID, _ = strconv.ParseUint(string(key), 10, 64)
+			tomatos = append(tomatos, *t)
+		}
+		return nil
+	}
+
+	err := b.driver.View(fn)
+	return tomatos, err
+}
+
+func (b *boltDBCtrl) Delete(id string) error {
+	return nil
+}
+
+func (b *boltDBCtrl) setupID(bk *bolt.Bucket, t *tomato.Tomato) ([]byte, error) {
+	var err error
+	t.ID, err = bk.NextSequence()
+	if err != nil {
+		return nil, err
+	}
+	return []byte(strconv.FormatUint(t.ID, 10)), nil
+}
+
 func homeDir() string {
 	// Not support Windows
 	return os.Getenv("HOME")
@@ -78,34 +135,4 @@ func prepareDBFile() {
 		}
 		defer fp.Close()
 	}
-}
-
-func (b *boltDBCtrl) Save(t *tomato.Tomato) error {
-	fn := func(tx *bolt.Tx) error {
-		bucket := tx.Bucket(b.bucketName)
-		id, err := b.setupID(bucket, t)
-		if err != nil {
-			return err
-		}
-		data, err := json.Marshal(t)
-		if err != nil {
-			return err
-		}
-		return bucket.Put(id, data)
-	}
-
-	return b.driver.Update(fn)
-}
-
-func (b *boltDBCtrl) Read() error {
-	return nil
-}
-
-func (b *boltDBCtrl) setupID(bk *bolt.Bucket, t *tomato.Tomato) ([]byte, error) {
-	var err error
-	t.ID, err = bk.NextSequence()
-	if err != nil {
-		return nil, err
-	}
-	return []byte(strconv.FormatUint(t.ID, 10)), nil
 }
