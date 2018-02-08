@@ -18,10 +18,10 @@ const (
 
 // Tomato model definition
 type Tomato struct {
-	ID        uint64    `json:"id"`
-	Name      string    `json:"name"`
-	Minutes   int       `json:"minutes"`
-	StartTime time.Time `json:"start_time"`
+	ID        uint64 `json:"id"`
+	Name      string `json:"name"`
+	Minutes   int    `json:"minutes"`
+	StartTime string `json:"start_time"`
 
 	seconds int
 	currLoc int
@@ -41,7 +41,7 @@ func New(name string, minutes int) *Tomato {
 
 // Start a tomato
 func (t *Tomato) Start() {
-	t.StartTime = time.Now()
+	t.StartTime = time.Now().Format("2006-01-02 15:04:05")
 	fmt.Printf("Start tomato(%d minutes) %s at %v\n", t.Minutes, t.Name, t.StartTime)
 	t.running()
 }

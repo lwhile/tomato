@@ -12,6 +12,10 @@ import (
 	"github.com/lwhile/tomato"
 )
 
+const (
+	fileMode = 0774
+)
+
 type boltDBCtrl struct {
 	driver     *bolt.DB
 	bucketName []byte
@@ -32,7 +36,7 @@ func (b *boltDBCtrl) InitDBEnv() error {
 
 	var err error
 	// prepare the db driver
-	if b.driver, err = bolt.Open(boltDBPath(), 0700, &bolt.Options{Timeout: 3 * time.Second}); err != nil {
+	if b.driver, err = bolt.Open(boltDBPath(), fileMode, &bolt.Options{Timeout: 3 * time.Second}); err != nil {
 		return err
 	}
 
@@ -58,15 +62,11 @@ func boltDBPath() string {
 }
 
 func prepareDBFile() {
-	p := boltDBPath()
-
-	// data file and dir not exist
-
 	if _, err := os.Stat(boltDBPath()); os.IsNotExist(err) {
 
 		// if dir not exist, create it.
 		if _, err := os.Stat(boltDBDir()); os.IsNotExist(err) {
-			err = os.MkdirAll(p, 0700)
+			err = os.MkdirAll(boltDBDir(), fileMode)
 			if err != nil {
 				log.Fatal(err)
 			}
